@@ -1,8 +1,9 @@
-"use client";
-
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Provider } from "@/lib/Provider";
+import { headers } from "next/headers";
+import { getConfig } from "@/wagmi.config";
+import { cookieToInitialState } from "wagmi";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,17 +15,21 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const initialState = cookieToInitialState(
+    getConfig(),
+    (await headers()).get("cookie") ?? ""
+  );
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Provider>{children}</Provider>
+        <Provider initialState={initialState}>{children}</Provider>
       </body>
     </html>
   );
